@@ -34,7 +34,8 @@ AnonRequest.configure do |config|
   config.shell                  = "/bin/zsh"   # Optional - Default ENV["SHELL"]
   config.sudo_password          = "my_pass"    # Required
   config.open_vpn_config_path   = "/path"      # Optional - Default "anon_request/open_vpn/configs" (only .ovpn file will be loaded)
-  config.open_vpn_stop_timeout  = 50           # Optional - Default 10
+  config.open_vpn_stop_timeout  = 50           # Optional - Default 10 (max delay to make successful open vpn connection)
+  config.anon_ip_delay          = 50           # Optional - Default 30 (max delay for checking if ip has been changed)
   config.rotation               = 10           # Optional - Default nil (no rotation) identity rotation for n requests
 end
 ```

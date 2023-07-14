@@ -46,7 +46,7 @@ module AnonRequest
     end
 
     def get(path, params = {})
-      Timeout.timeout(AnonRequest.configuration.open_vpn_delay) { sleep 5 until vpn? }
+      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until vpn? }
 
       inc_rotation
       @response = connection.get(path, params) do |request|
@@ -55,7 +55,7 @@ module AnonRequest
     end
 
     def post(path, body = {})
-      Timeout.timeout(AnonRequest.configuration.open_vpn_delay) { sleep 5 until vpn? }
+      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until vpn? }
 
       inc_rotation
       @response = connection.get(path, body) do |request|

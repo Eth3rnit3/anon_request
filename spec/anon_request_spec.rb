@@ -89,7 +89,7 @@ RSpec.describe AnonRequest::Client do
     let(:client) { AnonRequest::Client.new(base_url) }
     let(:path) { '/resources' }
 
-    before { AnonRequest.configuration.open_vpn_delay = 1 }
+    before { AnonRequest.configuration.anon_ip_delay = 1 }
 
     it { expect { client.get(path) }.to raise_error(Timeout::Error) }
   end
