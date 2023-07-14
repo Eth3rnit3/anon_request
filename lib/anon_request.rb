@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "faraday"
-require "uri"
-require "json"
-require "byebug"
+require 'faraday'
+require 'uri'
+require 'json'
+require 'byebug'
 
-Dir["#{File.dirname(__FILE__)}/anon_request/**/*.rb"].each { |file| require file }
+Dir["#{File.dirname(__FILE__)}/anon_request/**/*.rb"].sort.each { |file| require file }
 
 module AnonRequest
   class << self
@@ -19,7 +19,7 @@ module AnonRequest
   end
 
   class Error < StandardError; end
-  
+
   class Client
     include Agents
 
@@ -40,7 +40,7 @@ module AnonRequest
       end
     end
 
-    def post(path, body = {})
+    def post(path, _body = {})
       @response = connection.get(path, params) do |request|
         @request = request
       end

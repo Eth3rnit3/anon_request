@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe AnonRequest::OpenVpn::Client do
   let(:sudo_passs) { 'my_pass' }
   let(:config_file) { 'my_pass' }

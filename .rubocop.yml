@@ -3,11 +3,17 @@ AllCops:
 
 Style/StringLiterals:
   Enabled: true
-  EnforcedStyle: simple_quotes
+  EnforcedStyle: single_quotes
 
 Style/StringLiteralsInInterpolation:
   Enabled: true
-  EnforcedStyle: simple_quotes
+  EnforcedStyle: single_quotes
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/BlockLength:
+  Max: 50
 
 Layout/LineLength:
-  Max: 120
+  Max: 200
