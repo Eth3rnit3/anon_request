@@ -7,6 +7,7 @@ TODO: Delete this and the text above, and describe your gem
 ## Status
 ![Coverage](coverage/coverage.svg)
 ![Ruby critic](badges/rubycritic_badge_score.svg)
+![CI](https://github.com/Eth3rnit3/anon_request/actions/workflows/main.yml/badge.svg)
 
 ## Installation
 
