@@ -43,22 +43,26 @@ module AnonRequest
     yield(configuration)
   end
 
-  class Error < StandardError; end
-
   class Client
+    include Helpers
+    include Errors
     include Agents
 
     attr_reader :connection, :request, :response
 
     def initialize(base_url)
-      tor_proxy = URI(AnonRequest.configuration.tor_proxy)
-      proxy_options = if AnonRequest.configuration.use_tor
-                        {
-                          uri: AnonRequest.configuration.tor_proxy,
-                          user: tor_proxy.user,
-                          password: tor_proxy.password
-                        }
-                      end
+      tor_proxy     = URI(AnonRequest.configuration.tor_proxy)
+      proxy_options = nil
+
+      if AnonRequest.configuration.use_tor
+        raise Errors::TorNotInstalled unless tor_installed?
+
+        proxy_options = {
+          uri: AnonRequest.configuration.tor_proxy,
+          user: tor_proxy.user,
+          password: tor_proxy.password
+        }
+      end
 
       @connection = Faraday.new(url: base_url, proxy: proxy_options) do |faraday|
         faraday.headers['User-Agent'] = random_agent
