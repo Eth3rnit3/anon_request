@@ -15,6 +15,11 @@ end
 
 WebMock.disable_net_connect!(allow_localhost: true)
 
+def stub_get_ip_api(ip_address)
+  stub_request(:get, %r{ipinfo.io/ip})
+    .to_return(status: 200, body: ip_address)
+end
+
 def stub_api_get_call
   stub_request(:get, /api.example.com/)
     .to_return(status: 200, body: { success: true }.to_json)

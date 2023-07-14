@@ -35,6 +35,7 @@ module AnonRequest
       @request          = nil
       @response         = nil
       @request_count    = 0
+      @real_ip_address  = ip_address
       start_vpn
     end
 
@@ -45,6 +46,8 @@ module AnonRequest
     end
 
     def get(path, params = {})
+      Timeout.timeout(AnonRequest.configuration.open_vpn_delay) { sleep 5 until vpn? }
+
       inc_rotation
       @response = connection.get(path, params) do |request|
         @request = request
@@ -52,6 +55,8 @@ module AnonRequest
     end
 
     def post(path, body = {})
+      Timeout.timeout(AnonRequest.configuration.open_vpn_delay) { sleep 5 until vpn? }
+
       inc_rotation
       @response = connection.get(path, body) do |request|
         @request = request
@@ -59,6 +64,14 @@ module AnonRequest
     end
 
     private
+
+    def ip_address
+      Faraday.get('https://ipinfo.io/ip').body
+    end
+
+    def vpn?
+      ip_address != @real_ip_address
+    end
 
     def open_vpn
       @open_vpn ||= AnonRequest::OpenVpn::Client.instance

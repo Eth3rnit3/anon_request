@@ -15,6 +15,7 @@ RSpec.describe AnonRequest::Client do
   let(:base_url) { 'https://api.example.com' }
 
   before do
+    stub_get_ip_api('1.1.1.1')
     stub_api_get_call
     stub_api_post_call
   end
@@ -37,6 +38,7 @@ RSpec.describe AnonRequest::Client do
     end
 
     it 'calls get method and rotates client' do
+      stub_get_ip_api('1.1.1.2')
       expect(client).to receive(:get).with(path).and_call_original.exactly(6).times
 
       6.times { client.get(path) }
@@ -45,6 +47,7 @@ RSpec.describe AnonRequest::Client do
     end
 
     it 'calls post method and rotates client' do
+      stub_get_ip_api('1.1.1.2')
       expect(client).to receive(:post).with(path).and_call_original.exactly(6).times
 
       6.times { client.post(path) }
@@ -64,6 +67,7 @@ RSpec.describe AnonRequest::Client do
     end
 
     it 'calls get method and not rotates client' do
+      stub_get_ip_api('1.1.1.2')
       expect(client).to receive(:get).with(path).and_call_original.exactly(6).times
 
       6.times { client.get(path) }
@@ -72,11 +76,21 @@ RSpec.describe AnonRequest::Client do
     end
 
     it 'calls post method and not rotates client' do
+      stub_get_ip_api('1.1.1.2')
       expect(client).to receive(:post).with(path).and_call_original.exactly(6).times
 
       6.times { client.post(path) }
 
       expect(client).not_to have_received(:rotate)
     end
+  end
+
+  context 'when vpn is not connected' do
+    let(:client) { AnonRequest::Client.new(base_url) }
+    let(:path) { '/resources' }
+
+    before { AnonRequest.configuration.open_vpn_delay = 1 }
+
+    it { expect { client.get(path) }.to raise_error(Timeout::Error) }
   end
 end
