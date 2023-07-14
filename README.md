@@ -4,6 +4,9 @@ Welcome to your new gem! In this directory, you'll find the files you need to be
 
 TODO: Delete this and the text above, and describe your gem
 
+## Status
+![Coverage](coverage/coverage.svg)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -22,7 +25,7 @@ Or install it yourself as:
 
 ## Usage
 
-## Configuration
+### Configuration
 Create an initializer like `config/initializers/anon_request.rb` and configure it like this
 ```ruby
 AnonRequest.configure do |config|
@@ -30,6 +33,7 @@ AnonRequest.configure do |config|
   config.sudo_password          = "my_pass"    # Required
   config.open_vpn_config_path   = "/path"      # Optional - Default "anon_request/open_vpn/configs" (only .ovpn file will be loaded)
   config.open_vpn_stop_timeout  = 50           # Optional - Default 10
+  config.rotation               = 10           # Optional - Default nil (no rotation) identity rotation for n requests
 end
 ```
 
