@@ -42,6 +42,10 @@ module AnonRequest
         Process.kill('TERM', @pid)
         puts "[#{self.class}] - Killed process #{@pid}"
       end
+
+      def force_kill
+        system('sudo killall openvpn')
+      end
     end
   end
 end
