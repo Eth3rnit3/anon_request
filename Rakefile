@@ -6,7 +6,7 @@ require 'rubycritic_small_badge'
 require 'rubycritic/rake_task'
 
 RubyCriticSmallBadge.configure do |config|
-  config.minimum_score = 80
+  config.minimum_score = 90
 end
 RubyCritic::RakeTask.new do |task|
   task.options = %(--custom-format RubyCriticSmallBadge::Report
