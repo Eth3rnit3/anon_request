@@ -26,8 +26,9 @@ Or install it yourself as:
 Create an initializer like `config/initializers/anon_request.rb` and configure it like this
 ```ruby
 AnonRequest.configure do |config|
-  config.shell           = "/bin/zsh"   # Optional - Default ENV["SHELL"]
-  config.sudo_password   = "my_pass"    # Required
+  config.shell                  = "/bin/zsh"   # Optional - Default ENV["SHELL"]
+  config.sudo_password          = "my_pass"    # Required
+  config.open_vpn_config_path   = "/path"       # Optional - Default "anon_request/open_vpn/configs" (only .ovpn file will be loaded)
 end
 ```
 

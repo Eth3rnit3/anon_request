@@ -30,8 +30,16 @@ module AnonRequest
         faraday.headers['User-Agent'] = random_agent
         faraday.adapter Faraday.default_adapter
       end
-      @request = nil
-      @response = nil
+
+      @vpn_config_file  = AnonRequest.configuration.open_vpn_config_files.sample
+      @request          = nil
+      @response         = nil
+
+      start_vpn
+    end
+
+    def stop_vpn
+      open_vpn.kill
     end
 
     def get(path, params = {})
@@ -44,6 +52,18 @@ module AnonRequest
       @response = connection.get(path, params) do |request|
         @request = request
       end
+    end
+
+    private
+
+    def open_vpn
+      @open_vpn ||= AnonRequest::OpenVpn::Client.instance
+    end
+
+    def start_vpn
+      return true if AnonRequest::Configuration.test?
+
+      open_vpn.run(@vpn_config_file)
     end
   end
 end
