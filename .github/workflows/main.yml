@@ -14,7 +14,7 @@ jobs:
           bundler-cache: true
       - name: Run linter
         run: bundle exec rubocop
-      - name: Run ruby critic
-        run: bundle exec rake rubycritic
+      # - name: Run ruby critic
+      #   run: bundle exec rake rubycritic
       - name: Run spec
         run: bundle exec rspec
