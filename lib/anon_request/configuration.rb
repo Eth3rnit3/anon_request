@@ -6,7 +6,7 @@ module AnonRequest
       !ENV['RUN_RSPEC'].nil? || ENV['RACK_ENV'] == 'test' || ENV['RAILS_ENV'] == 'test'
     end
 
-    attr_accessor :shell, :sudo_password, :open_vpn_config_path, :open_vpn_stop_timeout, :anon_ip_delay, :rotation
+    attr_accessor :shell, :sudo_password, :open_vpn_config_path, :open_vpn_stop_timeout, :anon_ip_delay, :rotation, :use_tor, :tor_proxy
     attr_reader :open_vpn_config_files
 
     def initialize
@@ -14,9 +14,11 @@ module AnonRequest
       @sudo_password          = nil
       @open_vpn_config_path   = "#{__dir__}/open_vpn/configs"
       @open_vpn_config_files  = Dir["#{@open_vpn_config_path}/**/*.ovpn"]
-      @anon_ip_delay = 30
+      @anon_ip_delay          = 30
       @open_vpn_stop_timeout  = 10
       @rotation               = nil
+      @use_tor                = false
+      @tor_proxy              = 'socks5://127.0.0.1:9050'
     end
   end
 end

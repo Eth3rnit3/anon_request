@@ -12,6 +12,9 @@ Style/StringLiteralsInInterpolation:
 Style/Documentation:
   Enabled: false
 
+Metrics/AbcSize:
+  Max: 35
+
 Metrics/MethodLength:
   Max: 50
 

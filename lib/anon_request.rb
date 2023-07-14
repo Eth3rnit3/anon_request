@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'faraday'
+require 'faraday/net_http_persistent'
+require 'socksify'
+require 'socksify/http'
 require 'uri'
 require 'json'
 require 'byebug'
@@ -26,9 +29,23 @@ module AnonRequest
     attr_reader :connection, :request, :response
 
     def initialize(base_url)
-      @connection = Faraday.new(url: base_url) do |faraday|
+      tor_proxy = URI(AnonRequest.configuration.tor_proxy)
+      proxy_options = if AnonRequest.configuration.use_tor
+                        {
+                          uri: AnonRequest.configuration.tor_proxy,
+                          user: tor_proxy.user,
+                          password: tor_proxy.password
+                        }
+                      end
+
+      @connection = Faraday.new(url: base_url, proxy: proxy_options) do |faraday|
         faraday.headers['User-Agent'] = random_agent
-        faraday.adapter Faraday.default_adapter
+
+        if AnonRequest.configuration.use_tor
+          faraday.adapter TorAdapter
+        else
+          faraday.adapter Faraday.default_adapter
+        end
       end
 
       @vpn_config_file  = AnonRequest.configuration.open_vpn_config_files.sample
@@ -36,7 +53,7 @@ module AnonRequest
       @response         = nil
       @request_count    = 0
       @real_ip_address  = ip_address
-      start_vpn
+      # start_vpn
     end
 
     def stop_vpn
@@ -46,7 +63,7 @@ module AnonRequest
     end
 
     def get(path, params = {})
-      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until vpn? }
+      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until anon? }
 
       inc_rotation
       @response = connection.get(path, params) do |request|
@@ -55,7 +72,7 @@ module AnonRequest
     end
 
     def post(path, body = {})
-      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until vpn? }
+      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until anon? }
 
       inc_rotation
       @response = connection.get(path, body) do |request|
@@ -63,14 +80,27 @@ module AnonRequest
       end
     end
 
-    private
+    # private
 
     def ip_address
       Faraday.get('https://ipinfo.io/ip').body
     end
 
-    def vpn?
-      ip_address != @real_ip_address
+    def anon?
+      return ip_address != @real_ip_address unless AnonRequest.configuration.use_tor
+
+      tor?
+    end
+
+    def tor?
+      Timeout.timeout(5) do
+        response = connection.get('https://check.torproject.org')
+        return true if response.body.match?(/Congratulations. This browser is configured to use Tor/)
+
+        return false
+      end
+    rescue Timeout::Error
+      false
     end
 
     def open_vpn

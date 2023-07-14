@@ -5,8 +5,10 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in anon_request.gemspec
 gemspec
 
+gem 'faraday-net_http_persistent', '~> 2.0'
 gem 'rake', '~> 13.0'
 gem 'reek', '~> 6.0'
+gem 'socksify'
 
 gem 'rubocop', '~> 1.7'
 
