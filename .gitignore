@@ -6,6 +6,7 @@
 /pkg/
 /spec/reports/
 /tmp/
+lib/anon_request/open_vpn/configs/
 
 # rspec failure tracking
 .rspec_status

@@ -8,7 +8,15 @@ require "byebug"
 Dir["#{File.dirname(__FILE__)}/anon_request/**/*.rb"].each { |file| require file }
 
 module AnonRequest
-  
+  class << self
+    attr_accessor :configuration
+  end
+
+  def self.configure
+    self.configuration ||= Configuration.new
+    yield(configuration)
+  end
+
   class Error < StandardError; end
   
   class Client
