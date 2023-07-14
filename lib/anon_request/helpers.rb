@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+require 'English'
 module AnonRequest
   module Helpers
     def tor_installed?
@@ -10,7 +13,7 @@ module AnonRequest
 
     def linux_tor_installed?
       `dpkg -s tor`
-      $?.success?
+      $CHILD_STATUS.success?
     rescue Errno::ENOENT
       false
     end
