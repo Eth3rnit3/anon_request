@@ -93,4 +93,37 @@ RSpec.describe AnonRequest::Client do
 
     it { expect { client.get(path) }.to raise_error(Timeout::Error) }
   end
+
+  context 'when tor is set to true' do
+    let(:client) { AnonRequest::Client.new(base_url) }
+    let(:path) { '/resources' }
+
+    before { AnonRequest.configuration.use_tor = true }
+
+    it 'return success tor connection' do
+      stub_get_ip_api('1.1.1.2')
+      stub_tor_check_success
+
+      client.get(path)
+      expect(client).to be_tor
+    end
+  end
+
+  context 'when tor is set to false' do
+    let(:client) { AnonRequest::Client.new(base_url) }
+    let(:path) { '/resources' }
+
+    before do
+      AnonRequest.configuration.anon_ip_delay = 3
+      AnonRequest.configuration.use_tor = false
+    end
+
+    it 'raise timeout error' do
+      stub_get_ip_api('1.1.1.2')
+      stub_tor_check_not_success
+
+      expect { client.get(path) }.to raise_error(Timeout::Error)
+      expect(client).not_to be_tor
+    end
+  end
 end
