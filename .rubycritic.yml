@@ -1,0 +1,7 @@
+rubycritic:
+  format: json
+
+all:
+  directories:
+    - lib
+    - spec
