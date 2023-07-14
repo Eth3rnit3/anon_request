@@ -33,12 +33,14 @@ Or install it yourself as:
 Create an initializer like `config/initializers/anon_request.rb` and configure it like this
 ```ruby
 AnonRequest.configure do |config|
-  config.shell                  = "/bin/zsh"   # Optional - Default ENV["SHELL"]
-  config.sudo_password          = "my_pass"    # Required
-  config.open_vpn_config_path   = "/path"      # Optional - Default "anon_request/open_vpn/configs" (only .ovpn file will be loaded)
-  config.open_vpn_stop_timeout  = 50           # Optional - Default 10 (max delay to make successful open vpn connection)
-  config.anon_ip_delay          = 50           # Optional - Default 30 (max delay for checking if ip has been changed)
-  config.rotation               = 10           # Optional - Default nil (no rotation) identity rotation for n requests
+  config.shell                  = "/bin/zsh"                  # Optional - Default ENV["SHELL"]
+  config.sudo_password          = "my_pass"                   # Required
+  config.open_vpn_config_path   = "/path"                     # Optional - Default "anon_request/open_vpn/configs" (only .ovpn file will be loaded)
+  config.open_vpn_stop_timeout  = 50                          # Optional - Default 10 (max delay to make successful open vpn connection)
+  config.anon_ip_delay          = 50                          # Optional - Default 30 (max delay for checking if ip has been changed)
+  config.rotation               = 10                          # Optional - Default nil (no rotation) identity rotation for n requests
+  config.use_tor                = true                        # Optional - Default false use tor network via sock5 proxy, require tor package installed and started
+  config.tor_proxy              = 'socks5://ip.address:port'  # Optional - Default is socks5://127.0.0.1:9050 (default tor proxy server)
 end
 ```
 
