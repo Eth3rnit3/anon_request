@@ -1,12 +1,12 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-    echo "NO_ARGUMENT_ERROR"
+if [ $# -lt 2 ]; then
+    echo "ARGUMENT_ERROR: Two arguments required: 1) OpenVPN Config File 2) Sudo Password"
     exit 1
 fi
 
 if [ ! -f $1 ]; then
-    echo echo "INVALID_ARGUMENT_ERROR"
+    echo "NO_CONFIG_FILE_ERROR: OpenVPN config file does not exist or is not a file"
     exit 1
 fi
 

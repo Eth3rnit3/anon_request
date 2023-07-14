@@ -4,7 +4,10 @@ require 'singleton'
 
 module AnonRequest
   module OpenVpn
+    class NoArgumentrror < StandardError; end
+    class NoConfigFilerror < StandardError; end
     class NoPasswodError < StandardError; end
+
     class Client
       include Singleton
 
@@ -15,8 +18,9 @@ module AnonRequest
       end
 
       def run(config_file)
-        raise NoPasswodError if @sudo_pwd.nil?
-
+        raise NoPasswodError    if @sudo_pwd.nil?
+        raise NoConfigFilerror  if config_file.nil? || !File.exist?(config_file)
+        return :success         if AnonRequest::Configuration.test?
 
         system("#{@shell} #{@executor} #{config_file} #{@sudo_pwd}")
       end
