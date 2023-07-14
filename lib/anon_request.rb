@@ -10,6 +10,28 @@ require 'byebug'
 
 Dir["#{File.dirname(__FILE__)}/anon_request/**/*.rb"].sort.each { |file| require file }
 
+Socksify.debug = true
+
+class Faraday::Adapter::NetHttp # rubocop:disable Style/ClassAndModuleChildren
+  def net_http_connection(env)
+    if (proxy = env[:request][:proxy])
+      proxy_class(proxy)
+    else
+      Net::HTTP
+    end.new(env[:url].hostname, env[:url].port || (env[:url].scheme == 'https' ? 443 : 80))
+  end
+
+  def proxy_class(proxy)
+    if proxy.uri.scheme == 'socks5'
+      TCPSocket.socks_username = proxy.uri.user if proxy.uri.user
+      TCPSocket.socks_password = proxy.uri.password if proxy.uri.password
+      Net::HTTP::SOCKSProxy(proxy[:uri].host, proxy[:uri].port)
+    else
+      Net::HTTP::Proxy(proxy[:uri].host, proxy[:uri].port, proxy[:uri].user, proxy[:uri].password)
+    end
+  end
+end
+
 module AnonRequest
   class << self
     def configuration
@@ -42,7 +64,7 @@ module AnonRequest
         faraday.headers['User-Agent'] = random_agent
 
         if AnonRequest.configuration.use_tor
-          faraday.adapter TorAdapter
+          faraday.adapter Faraday::Adapter::NetHttp
         else
           faraday.adapter Faraday.default_adapter
         end
@@ -53,7 +75,8 @@ module AnonRequest
       @response         = nil
       @request_count    = 0
       @real_ip_address  = ip_address
-      # start_vpn
+
+      start_vpn
     end
 
     def stop_vpn
@@ -99,7 +122,7 @@ module AnonRequest
 
         return false
       end
-    rescue Timeout::Error
+    rescue Timeout::Error, Faraday::ConnectionFailed
       false
     end
 
