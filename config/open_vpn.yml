@@ -1,0 +1,14 @@
+default:
+  - name: Germany
+    path: config/open_vpn/germany.ovpn
+    username: freeopenvpn
+    password: 02614AS38
+
+  - name: Japan
+    path: config/open_vpn/japan.ovpn
+    delay: 60
+
+  - name: Russia
+    path: config/open_vpn/russia.ovpn
+    username: freeopenvpn
+    password: 262860777

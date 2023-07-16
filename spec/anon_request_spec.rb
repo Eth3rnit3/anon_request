@@ -15,6 +15,7 @@ RSpec.describe AnonRequest::Client do
   let(:base_url) { 'https://api.example.com' }
 
   before do
+    AnonRequest.configuration.open_vpn_config_file = 'config/open_vpn.test.yml'
     stub_get_ip_api('1.1.1.1')
     stub_api_get_call
     stub_api_post_call

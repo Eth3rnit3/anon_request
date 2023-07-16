@@ -12,27 +12,34 @@ module AnonRequest
       include Singleton
 
       def initialize
-        @executor = "#{__dir__}/client.sh"
-        @shell    = AnonRequest.configuration.shell
-        @sudo_pwd = AnonRequest.configuration.sudo_password
-        @pid      = nil
+        @shell              = AnonRequest.configuration.shell
+        @pid                = nil
+        @deconnection_delay = AnonRequest.configuration.open_vpn_stop_timeout
       end
 
-      def run(config_file)
-        raise NoPasswodError    if @sudo_pwd.nil?
-        raise NoConfigFilerror  if config_file.nil? || !File.exist?(config_file)
+      def run(vpn_config)
+        raise NoConfigFilerror  if vpn_config.nil? || !File.exist?(vpn_config.absolute_path)
         return :success         if AnonRequest::Configuration.test?
 
-        command = "#{@shell} #{@executor} #{config_file} #{@sudo_pwd}"
+        cmd = command(vpn_config)
 
-        @pid = spawn(command)
+        puts cmd
+        @pid = spawn(cmd)
         Process.detach(@pid)
 
         @pid
       end
 
+      def command(vpn_config)
+        command = "openvpn --config #{vpn_config.absolute_path}"
+        command = "echo #{AnonRequest.configuration.sudo_password} | sudo -S  #{command}" if AnonRequest.configuration.sudo_password
+        command = "#{command} --auth-user-pass #{vpn_config.creadentials_path}" if vpn_config.auth?
+
+        command
+      end
+
       def kill
-        Timeout.timeout(AnonRequest.configuration.open_vpn_stop_timeout) do
+        Timeout.timeout(@deconnection_delay) do
           puts "[#{self.class}] - Terminate process #{@pid}"
           Process.kill('TERM', @pid)
           puts "[#{self.class}] - Terminated process #{@pid}"
@@ -44,7 +51,9 @@ module AnonRequest
       end
 
       def force_kill
-        system('sudo killall openvpn')
+        raise NoPasswodError if AnonRequest.configuration.sudo_password.nil?
+
+        system("echo #{AnonRequest.configuration.sudo_password} | sudo -S  sudo killall openvpn")
       end
     end
   end

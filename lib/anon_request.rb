@@ -45,7 +45,7 @@ module AnonRequest
     include Errors
     include Agents
 
-    attr_reader :connection, :request, :response
+    attr_reader :connection, :request, :response, :vpn_config
 
     def initialize(base_url)
       tor_proxy     = URI(AnonRequest.configuration.tor_proxy)
@@ -71,13 +71,14 @@ module AnonRequest
         end
       end
 
-      @vpn_config_file  = AnonRequest.configuration.open_vpn_config_files.sample
+      @vpn_config       = AnonRequest.configuration.open_vpn_config_files.sample
       @request          = nil
       @response         = nil
       @request_count    = 0
       @real_ip_address  = ip_address
+      @connection_delay = @vpn_config.delay
 
-      # start_vpn
+      start_vpn
     end
 
     def stop_vpn
@@ -87,7 +88,7 @@ module AnonRequest
     end
 
     def get(path, params = {})
-      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until anon? }
+      Timeout.timeout(@connection_delay) { sleep 5 until anon? }
 
       inc_rotation
       @response = connection.get(path, params) do |request|
@@ -96,7 +97,7 @@ module AnonRequest
     end
 
     def post(path, body = {})
-      Timeout.timeout(AnonRequest.configuration.anon_ip_delay) { sleep 5 until anon? }
+      Timeout.timeout(@connection_delay) { sleep 5 until anon? }
 
       inc_rotation
       @response = connection.get(path, body) do |request|
@@ -134,13 +135,14 @@ module AnonRequest
     def start_vpn
       return true if AnonRequest::Configuration.test?
 
-      open_vpn.run(@vpn_config_file)
+      open_vpn.run(@vpn_config)
     end
 
     def rotate
       connection.headers['User-Agent'] = random_agent
       stop_vpn
-      @vpn_config_file = AnonRequest.configuration.open_vpn_config_files.sample
+      @vpn_config       = AnonRequest.configuration.open_vpn_config_files.sample
+      @connection_delay = vpn_config.delay
       start_vpn
     end
 
